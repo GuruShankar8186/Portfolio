@@ -569,6 +569,10 @@ section{position:relative;z-index:2;padding:7rem 5vw}
 }
 .btn-send:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,229,255,0.36)}
 
+.contact-status{margin-top:1rem;color:var(--white);font-size:.95rem;line-height:1.5;min-height:1.6em}
+.contact-status.success{color:#7ef7b4}
+.contact-status.error{color:#f87171}
+
 /* contact background glow orbs */
 .orb{
   position:absolute;border-radius:50%;pointer-events:none;
@@ -1028,30 +1032,31 @@ footer span{color:var(--cyan)}
           </a>
         </div>
       </div>
-      <div class="contact-form reveal r2">
+      <form id="contactForm" class="contact-form reveal r2">
         <div class="form-row">
           <div class="fg">
-            <label>Name</label>
-            <input type="text" placeholder="Your name"/>
+            <label for="contactName">Name</label>
+            <input id="contactName" name="name" type="text" placeholder="Your name" required />
           </div>
           <div class="fg">
-            <label>Email</label>
-            <input type="email" placeholder="your@email.com"/>
+            <label for="contactEmail">Email</label>
+            <input id="contactEmail" name="email" type="email" placeholder="your@email.com" required />
           </div>
         </div>
         <div class="fg">
-          <label>Subject</label>
-          <input type="text" placeholder="Project collaboration, job opportunity…"/>
+          <label for="contactSubject">Subject</label>
+          <input id="contactSubject" name="subject" type="text" placeholder="Project collaboration, job opportunity…" required />
         </div>
         <div class="fg">
-          <label>Message</label>
-          <textarea placeholder="Tell me about your project or opportunity…"></textarea>
+          <label for="contactMessage">Message</label>
+          <textarea id="contactMessage" name="message" placeholder="Tell me about your project or opportunity…" required></textarea>
         </div>
-        <button class="btn-send">
+        <button type="submit" class="btn-send">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           Send Message
         </button>
-      </div>
+        <p id="contactStatus" class="contact-status" aria-live="polite"></p>
+      </form>
     </div>
   </div>
 </section>
@@ -1367,6 +1372,35 @@ document.querySelectorAll('.btn-mag').forEach(btn=>{
     btn.style.transform='';
   });
 });
+
+const contactForm=document.getElementById('contactForm');
+const contactStatus=document.getElementById('contactStatus');
+if(contactForm){
+  contactForm.addEventListener('submit',e=>{
+    e.preventDefault();
+    const name=document.getElementById('contactName').value.trim();
+    const email=document.getElementById('contactEmail').value.trim();
+    const subject=document.getElementById('contactSubject').value.trim();
+    const message=document.getElementById('contactMessage').value.trim();
+
+    if(!name||!email||!subject||!message){
+      contactStatus.textContent='Please fill in all fields before sending.';
+      contactStatus.classList.add('error');
+      contactStatus.classList.remove('success');
+      return;
+    }
+
+    const mailto='mailto:gurushankar0008@gmail.com'
+      + '?subject=' + encodeURIComponent(subject)
+      + '&body=' + encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
+
+    contactStatus.textContent='Opening your email client…';
+    contactStatus.classList.add('success');
+    contactStatus.classList.remove('error');
+
+    window.location.href = mailto;
+  });
+}
 
 /* ── SMOOTH SECTION PARALLAX ── */
 window.addEventListener('scroll',()=>{
