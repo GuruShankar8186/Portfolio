@@ -1390,15 +1390,53 @@ if(contactForm){
       return;
     }
 
-    const mailto='mailto:gurushankar0008@gmail.com'
-      + '?subject=' + encodeURIComponent(subject)
-      + '&body=' + encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
-
-    contactStatus.textContent='Opening your email client…';
+    contactStatus.textContent='Sending message...';
     contactStatus.classList.add('success');
     contactStatus.classList.remove('error');
 
-    window.location.href = mailto;
+    // Disable form fields/button while sending
+    const submitBtn = contactForm.querySelector('.btn-send');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Sending...';
+
+    fetch('https://formsubmit.co/ajax/gurushankar0008@gmail.com', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        name: name,
+        email: email,
+        _subject: `Portfolio Contact: ${subject}`,
+        message: message,
+        _replyto: email
+      })
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Server returned an error');
+      }
+    })
+    .then(data => {
+      contactStatus.textContent = 'Thank you! Your message has been sent successfully. (Note: Check your email inbox to confirm/activate if this is the first submission)';
+      contactStatus.classList.add('success');
+      contactStatus.classList.remove('error');
+      contactForm.reset();
+    })
+    .catch(error => {
+      console.error('Error submitting contact form:', error);
+      contactStatus.textContent = 'Oops! There was a problem sending your message. Please try again.';
+      contactStatus.classList.add('error');
+      contactStatus.classList.remove('success');
+    })
+    .finally(() => {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
+    });
   });
 }
 
